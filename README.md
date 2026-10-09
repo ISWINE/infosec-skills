@@ -4,6 +4,14 @@
 
 姊妹仓库：[zcode-skills](https://github.com/ISWINE/zcode-skills)（通用技能），本仓库专注信息安全方向（逆向、取证、样本分析、攻防实验），两仓遵循同一套规则。
 
+> **安全工具分支（`安全工具`）**：收录经一致性验证的安全工具源码，main 保持纯技能。工具以**原生历史**直接作为分支内容（提交 SHA/作者/日期原样保留，可在 GitHub 上直接追溯）。
+>
+> | 工具 | 布局 | 来源与指纹 |
+> |---|---|---|
+> | ARTEX v0.3.15 | 分支根目录 | `mhtsec/ARTEX`（2026-10-09 同步；HEAD `5c0dbd4bec94`，tree `9e4e5ee3f6bc`，458 提交 SHA 与上游完全一致；上游 Autumn-27/ARTEX 已删库，mhtsec 与 wangjingtiankl/ARTEX 字节级一致） |
+>
+> 注意：ARTEX ≤v0.3.14 存在预认证 RCE（TOCTOU，见 therustymate/ARTXploit），部署用 v0.3.15 血统并控制暴露面。
+
 ## 当前技能
 
 | 技能 | 用途 | 触发方式 |
