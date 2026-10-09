@@ -70,3 +70,12 @@ cp /d/tools/ida/ScyllaHideForIDA9.0/{ScyllaHideIDAProPlugin.dll,ScyllaHideIDASer
 ```
 
 预期：initialize OK + tools/list 报 66 个工具（IDA 未开时 tools/list 报 ConnectionRefused 属正常——桥本身健康）。全链路金标准 = 拉起 IDA 后 `server_health` 返回 `status: ok`。
+
+## 实战经验（2026-10-09 IObit 破解版一案）
+
+- **多目标并行**：第二个 IDA 实例自动换端口，发现文件在 `%APPDATA%\Hex-Rays\IDA Pro\mcp\instances\instance_<port>.json`；MCP 调用端点跟着换。10MB Delphi 程序自动分析约 8 分钟（CPU ~260s）。
+- **py_eval 的 exec 闭包坑**：回调函数里引用外层变量会 NameError，必须用默认参数绑定（`def cb(ea,name,ord_,c=c,m=m):`）。
+- **Delphi 目标套路**：方法名大多不进符号表，字符串 xrefs 常为空（窗体流间接引用）；先用 python 在文件偏移找串，再 `idaapi.get_fileregion_ea(off)` 转 VA。破解补丁识别：扫 `B8 xx 00 00 00 C2/C3` 单值桩（`mov eax,imm; ret`），注意区分正常 Delphi getter（plain `ret`）与 stdcall 导出桩（`ret N`）。
+- **授权类 DLL 定位**：先看导出表——名字含 Check/Active/Validate/License/Days 的导出直接反编译；HashMismatch（签名坏）文件优先级最高，overlay 里的 PKCS#7 残留 = 原来是签名的官方文件被改。
+- **解包工具链**：`D:\tools\7zip\`（x86/x64 完整版 + 7za，26.04 能开 Inno 6.2+ 新格式）、`D:\tools\innoextract\`（只到 Inno 6.0.5）。安装器先看 overlay：BOM+`;!@Install@!` = Inno 6.2+ 直接用 7z 全功能版解。
+- 顺手写的 HTTP MCP 客户端可复用（urllib POST /mcp，解析 content[0].text 二次 JSON），比 bash 拼 curl 稳。
