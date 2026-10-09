@@ -1,26 +1,40 @@
 # infosec-skills
 
-信息安全技能集——逆向分析、流量取证、样本分析等方向的 ZCode（AI 编码代理）技能仓库。每个技能是一个可直接投产的 `SKILL.md` 工作流，沉淀"在本机踩平的坑"。
+信息安全方向的个人 ZCode 技能仓库（agent skills）。目录结构遵循 ZCode 技能发现规范：`.agents/skills/<name>/SKILL.md`——整个仓库克隆到任何项目目录下，里面的技能即可被 ZCode 项目级发现自动加载；本机则通过 junction 联接提供用户级发现。
 
-## 技能清单
+姊妹仓库：[zcode-skills](https://github.com/ISWINE/zcode-skills)（通用技能），本仓库专注信息安全方向（逆向、取证、样本分析、攻防实验），两仓遵循同一套规则。
 
-| 技能 | 说明 |
-|---|---|
-| [ida-re](skills/ida-re/) | IDA Pro 9.1 + ida-pro-mcp 逆向分析工作台：加载目标 → MCP 静态分析 → 反编译 → 注释落库，含 ScyllaHide 反反调试动态加载与完整性自检 |
+## 当前技能
 
-## 本地安装
+| 技能 | 用途 | 触发方式 |
+|---|---|---|
+| `ida-re` | IDA Pro 9.1 + ida-pro-mcp 逆向分析工作台：副本加载（`-A` 无弹窗）→ 轮询 13337 → `server_health` 等自动分析就绪 → imports/list_funcs 摸底 → decompile 读伪码 → set_comment/重命名落库 → `idb_save`；带反调试检测的目标先静态查指纹再动态挂 ScyllaHide（已下载未安装，用时拷三件套进 plugins 重启 IDA）；含 stdio 桥完整性自检脚本 | 说"逆向/反编译/看这个 exe、dll、so/二进制分析/查壳/脱壳/找算法/IDA 分析"自动触发 |
 
-把技能目录整棵拷到 ZCode 的用户级技能目录即可被发现：
+## 本机部署方式（junction 联接）
+
+真身在 `D:\projects\infosec-skills\.agents\skills\<name>`，用户级发现路径 `~/.agents/skills/<name>` 是指向它的 JUNCTION：
+
+```cmd
+mklink /J C:\Users\12696\.agents\skills\<name> D:\projects\infosec-skills\.agents\skills\<name>
+```
+
+改技能直接改本仓库文件即可（联接透明），改完记得 commit + push。
+
+## 扩充新技能
+
+1. 在 `.agents/skills/` 下新建 `<name>/SKILL.md`（frontmatter 必须含 `name` 和 `description`，name 与目录同名，kebab-case）
+2. 可选挂 `scripts/`（可执行脚本）、`references/`（模型按需读的细节文档）、`assets/`（模板）
+3. 需要用户级可用就在本机做联接（见上）；仅项目用则随仓库克隆自动生效
+4. `SKILL.md` 控制在 500 行内，细节往 `references/` 拆
+
+## 同步
 
 ```bash
-# Windows
-xcopy /E /I skills\ida-re "%USERPROFILE%\.agents\skills\ida-re"
-
-# 或类 Unix
-cp -r skills/ida-re ~/.agents/skills/ida-re
+cd /d/projects/infosec-skills
+git add -A && git commit -m "..." && git push
 ```
 
 ## 注意
 
-- 技能内的绝对路径（如 `D:\tools\ida\...`）是作者本机布局，换机器需要按 `SKILL.md` 里的环境表改成自己的路径。
-- [ida-re](skills/ida-re/) 依赖：IDA Pro 9.x + [ida-pro-mcp](https://github.com/mrexodia/ida-pro-mcp) 2.0.0，且 ZCode 已配置对应 MCP 服务器（工具前缀 `mcp__ida-pro-mcp__*`）。
+- `ida-re` 的 SKILL.md 含本机路径与工具布局（`D:\tools\ida` 等），仓库保持 **private**
+- 技能入库前须过安全审查（参照 ida-re 的做法：来源可溯、与官方 diff、无网络指标）
