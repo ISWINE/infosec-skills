@@ -23,7 +23,7 @@
 真身在 `D:\projects\infosec-skills\.agents\skills\<name>`，用户级发现路径 `~/.agents/skills/<name>` 是指向它的 JUNCTION：
 
 ```cmd
-mklink /J C:\Users\12696\.agents\skills\<name> D:\projects\infosec-skills\.agents\skills\<name>
+mklink /J "%USERPROFILE%\.agents\skills\<name>" D:\projects\infosec-skills\.agents\skills\<name>
 ```
 
 改技能直接改本仓库文件即可（联接透明），改完记得 commit + push。
